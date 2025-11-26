@@ -38,7 +38,7 @@ module.exports = (app) => {
       // Send goodbye message
       await client.chat.postMessage({
         channel: TARGET_CHANNEL,
-        text: `@${userName} has left the channel :hs: Bye!`,
+        text: `${userName} has left the channel :hs: Bye!`,
       });
 
       console.log(`User ${userName} (${userId}) left ${TARGET_CHANNEL}`);
