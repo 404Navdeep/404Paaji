@@ -1,39 +1,43 @@
 module.exports = (app) => {
   const TARGET_CHANNEL = 'C08JRG8VCBY';
-  const TARGET_USERGROUP = 'S09KY3K8ZFH';
+  const RABBITS_USERGROUP = 'S09KY3K8ZFH';
 
-  app.message(async ({ message, say, client }) => {
+  app.message(async ({ message, client }) => {
     try {
       if (message.channel !== TARGET_CHANNEL) {
         return;
       }
 
-      if (!message.text || !message.text.includes(`<!subteam^${TARGET_USERGROUP}`)) {
+      if (!message.thread_ts) {
         return;
       }
 
-      const channelResponse = await client.chat.postMessage({
+      const threadMessages = await client.conversations.replies({
         channel: TARGET_CHANNEL,
-        text: `:thread: :this: :here:`,
+        ts: message.thread_ts,
       });
 
-      const sentMessageTs = channelResponse.ts;
-
-      if (message.thread_ts || message.ts) {
-        const threadTs = message.thread_ts || message.ts;
-        
-        await client.chat.postMessage({
-          channel: TARGET_CHANNEL,
-          thread_ts: threadTs,
-          text: `Heyo! Dont send a message here!(It pings everyone:hs:) Send it in <https://slack.com/archives/${TARGET_CHANNEL}/p${sentMessageTs.replace('.', '')}|this> thread instead!`,
-        });
+      if (!threadMessages.messages || threadMessages.messages.length === 0) {
+        return;
       }
 
-      console.log(`User group mentioned in ${TARGET_CHANNEL}, responses sent.`);
+      const parentText = threadMessages.messages[0].text;
+
+      if (!parentText || !parentText.includes(`<!subteam^${RABBITS_USERGROUP}`)) {
+        return;
+      }
+
+      await client.chat.postMessage({
+        channel: TARGET_CHANNEL,
+        thread_ts: message.thread_ts,
+        text: `Heyo! Dont send a message here! (It pings everyone :hs:). Sent it in <#${TARGET_CHANNEL}> instead `,
+      });
+
+      console.log(`Rabbits mentioned, response sent in thread`);
     } catch (error) {
-      console.error('Error in usergroup mention feature:', error);
+      console.error('Error in rabbits ping feature:', error);
     }
   });
 
-  console.log('✓ User group mention feature loaded');
+  console.log('✓ Rabbits ping feature loaded');
 };
