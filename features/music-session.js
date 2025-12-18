@@ -149,7 +149,7 @@ module.exports = (app) => {
         await updateMessage(blocks);
       }
     } catch (error) {
-      console.error('Error polling music:', error.message);
+      console.error('Error polling music:', error.response?.status || error.code || error.message || error);
     }
   };
 
