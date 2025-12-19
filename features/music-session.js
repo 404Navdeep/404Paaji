@@ -148,7 +148,7 @@ module.exports = (app) => {
         const blocks = buildMessage(data, sessionStartTime);
         await updateMessage(blocks);
       }
-    } catch (error) {
+    } catch (error) {         
       console.error('Error polling music:', error.response?.status || error.code || error.message || error);
     }
   };
